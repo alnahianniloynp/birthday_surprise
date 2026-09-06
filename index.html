@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> My Special Person ❤️</title>
+  
+  <!-- Favicon / Title Bar Image -->
+  
+
+  <!-- Tailwind CSS & Confetti -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    body { 
+      font-family: 'Poppins', sans-serif; 
+      background: radial-gradient(circle at top left, #fbcfe8, #f3e8ff, #ffe6ea);
+      background-attachment: fixed;
+    }
+    .font-cursive { font-family: 'Dancing Script', cursive; }
+
+    /* iOS Glassmorphism UI */
+    .ios-glass {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 3D Flip Cards */
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    
+    .card-inner {
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .flipped .card-inner { 
+      transform: rotateY(180deg) !important; 
+    }
+
+    .card-vanish-img {
+      filter: blur(10px) opacity(0.4);
+      transform: scale(0.95);
+      transition: all 0.4s ease;
+    }
+    .card-container:hover .card-vanish-img,
+    .card-container.flipped .card-vanish-img {
+      filter: blur(0px) opacity(1);
+      transform: scale(1);
+    }
+
+    /* Candle Flame Animation */
+    .candle-flame {
+      transform-origin: center bottom;
+      animation: flicker 0.6s infinite alternate;
+      transition: opacity 0.3s ease;
+    }
+    @keyframes flicker {
+      0% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+      100% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+    }
+    .flame-off { opacity: 0 !important; animation: none !important; }
+
+    /* Background Floating Hearts */
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+    }
+    .heart-bg {
+      position: fixed;
+      top: 100%;
+      pointer-events: none;
+      animation: float 10s linear infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-gray-800 relative overflow-x-hidden">
+
+  <!-- Floating Hearts Container -->
+  <div id="hearts-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+  <!-- Background Music -->
+  <audio id="login-music" loop preload="auto">
+    <source src="level.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- ================= 1. LOGIN SCREEN ================= -->
+  <div id="login-screen" onclick="startAudio()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pink-100/60 backdrop-blur-2xl">
+    <div class="ios-glass p-8 sm:p-10 rounded-3xl max-w-md w-full text-center relative border border-white/80">
+      
+      <div class="w-20 h-20 bg-pink-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl animate-bounce">
+        🔐
+      </div>
+
+      <h2 class="text-3xl font-bold text-pink-600 mb-2 font-cursive">Private Entrance 💖</h2>
+      <p class="text-sm text-gray-600 mb-6">Amader first kotha hoy kbe?</p>
+
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="mb-4 text-left">
+          <label class="block text-xs font-semibold text-pink-700 uppercase tracking-wider mb-2">Secret Password</label>
+          <input type="password" id="secret-pass" required placeholder="Type password here..." 
+            class="w-full px-5 py-3.5 rounded-2xl border border-pink-200/80 focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white/60 text-gray-700 shadow-inner transition">
+        </div>
+        
+        <p id="login-error" class="text-red-500 text-xs mb-3 hidden font-medium">carefully thinking! format: 180526</p>
+        
+        <button type="submit" class="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-2xl font-semibold shadow-lg hover:shadow-pink-500/25 hover:scale-[1.02] active:scale-[0.98] transition">
+          Unlock Surprise ✨
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= 2. MAIN WEBSITE CONTENT ================= -->
+  <div id="main-content" class="hidden max-w-5xl mx-auto px-4 pt-12 pb-24 relative z-10">
+
+    <!-- Header -->
+    <header class="text-center mb-16">
+      
+      <h1 class="text-5xl sm:text-7xl font-bold text-pink-600 font-cursive mt-3 mb-3 drop-shadow-sm">Happy Birthday My Favourite One! ❤️</h1>
+      <p class="text-gray-600 italic text-base sm:text-lg">This special little world is created only for you.</p>
+    </header>
+
+
+    <!-- SECTION 1: 17-Second Video Wish -->
+    <section class="ios-glass rounded-3xl p-6 sm:p-8 shadow-xl mb-12 border border-white/80">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <span class="text-2xl">🎥</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 font-cursive">A Special Wish For You</h2>
+      </div>
+
+      <div class="aspect-video w-full max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl bg-black/80 border-4 border-white/60">
+        <video id="main-video" controls class="w-full h-full object-cover">
+          <source src="first.mp4" type="video/mp4">
+        </video>
+      </div>
+    </section>
+
+
+    <!-- SECTION 2: Fixed Microphone & Blow Candle Cake -->
+    <section class="ios-glass rounded-3xl p-8 sm:p-10 shadow-xl mb-12 text-center border border-white/80">
+      <h2 class="text-3xl sm:text-4xl font-bold text-pink-600 font-cursive mb-2">🎂 Make a Wish & Blow the Candle</h2>
+      
+      <!-- Dynamic Status -->
+      <p id="cake-status" class="text-sm text-pink-700 bg-pink-100/60 py-2 px-5 rounded-full inline-block font-medium mb-4">
+        🎙️ Click the button below to enable microphone
+      </p>
+
+      <!-- Cake SVG -->
+      <div class="w-52 h-52 mx-auto cursor-pointer mb-4 hover:scale-105 transition-transform" onclick="blowOutCandle()">
+        <svg viewBox="0 0 200 200" class="w-full h-full filter drop-shadow-md">
+          <rect x="30" y="120" width="140" height="60" rx="12" fill="#f4a261" />
+          <rect x="20" y="150" width="160" height="30" rx="12" fill="#e76f51" />
+          <path d="M 30,120 Q 45,135 60,120 Q 75,135 90,120 Q 105,135 120,120 Q 135,135 150,120 Q 170,135 170,120 L 170,110 L 30,110 Z" fill="#ffffff" />
+          <rect x="95" y="70" width="10" height="40" rx="2" fill="#e9c46a" />
+          <path id="flame" class="candle-flame" d="M 100,50 C 95,62 95,70 100,70 C 105,70 105,62 100,50 Z" fill="#ff4500" />
+          <circle id="flame-inner" class="candle-flame" cx="100" cy="63" r="3" fill="#ffda79" />
+        </svg>
+      </div>
+
+      <!-- Realtime Audio Sound Meter -->
+      <div id="meter-container" class="w-full max-w-md mx-auto bg-gray-200/80 h-3 rounded-full overflow-hidden my-4 hidden border border-pink-200">
+        <div id="volume-meter" class="bg-gradient-to-r from-pink-400 to-rose-600 h-full w-0 transition-all duration-75"></div>
+      </div>
+
+      <!-- Action Button -->
+      <button id="mic-btn" onclick="startMicLogic()" class="px-8 py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-semibold rounded-full shadow-lg hover:shadow-pink-500/30 hover:scale-105 active:scale-95 transition text-sm">
+        🎙️ Enable Microphone
+      </button>
+
+      <!-- Wish Message -->
+      <div id="wish-message" class="hidden mt-6 text-2xl sm:text-3xl font-bold text-pink-600 font-cursive animate-bounce">
+        🎉 Happy Birthday My Special Person! May all your dreams come true! ❤️
+      </div>
+    </section>
+
+
+    <!-- SECTION 3: Moments Video Gallery -->
+    <section class="ios-glass rounded-3xl p-6 sm:p-8 shadow-xl mb-12 border border-white/80">
+      <div class="flex items-center justify-center gap-2 mb-6">
+        <span class="text-2xl">🎬</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 font-cursive">Our Sweet Moments</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/80 shadow-sm">
+          <video controls class="w-full h-48 object-cover rounded-xl mb-3">
+            <source src="first (1).mp4" type="video/mp4">
+          </video>
+          <h3 class="font-semibold text-gray-700 text-center font-cursive text-xl">Our Special Day ❤️</h3>
+        </div>
+
+        <div class="bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/80 shadow-sm">
+          <video controls class="w-full h-48 object-cover rounded-xl mb-3">
+            <source src="first (2).mp4" type="video/mp4">
+          </video>
+          <h3 class="font-semibold text-gray-700 text-center font-cursive text-xl">Cute Memory😍</h3>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- SECTION 4: 8 Interactive Flip Cards -->
+    <section class="ios-glass rounded-3xl p-6 sm:p-8 shadow-xl border border-white/80">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 font-cursive mb-1">📸 Flip Cards: Secret Notes</h2>
+        <p class="text-xs text-gray-500">Hover to clear image, tap/click to flip!</p>
+      </div>
+
+      <div id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </section>
+
+  </div>
+
+
+  <!-- ================= 3. JAVASCRIPT LOGIC ================= -->
+  <script>
+    const CORRECT_PASSWORD = "100126";
+    const music = document.getElementById('login-music');
+    let musicStarted = false;
+    let isBlown = false;
+    let micStream, audioCtx, analyser;
+
+    function startAudio() {
+      if (!musicStarted) {
+        music.play().catch(() => {});
+        musicStarted = true;
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const inputPass = document.getElementById('secret-pass').value.trim();
+      const errorMsg = document.getElementById('login-error');
+
+      if (inputPass === CORRECT_PASSWORD) {
+        music.pause();
+        music.currentTime = 0;
+
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-content').classList.remove('hidden');
+      } else {
+        errorMsg.classList.remove('hidden');
+      }
+    }
+
+    // 8 Secret Cards Data
+    const cardData = [
+      { img: "pic5.jpeg", note: "Some people are born just to make the story beautiful—just like September. ❤️" },
+      { img: "pic8.jpg", note: "Sitting beside you, I feel like I can see the entire world.😍" },
+      { img: "pic6.jpeg", note: "Stay blessed & stay happy always! Infinite love for you ✨" },
+      { img: "pic3.jpeg", note: "My forever begins today, right here, with you.! 😊" },
+      { img: "pic7.jpeg", note: "Every moment spent with you is a priceless memory 💕" },
+      { img: "pic4.jpeg", note: "You make my world so much brighter and better! 🌟" },
+      { img: "pic2.jpeg", note: "Always keep shining and chasing your dreams! 🌸" },
+      { img: "pic1.jpeg", note: "Happy Birthday once again! Yours forever ❤️" }
+    ];
+
+    const gridContainer = document.getElementById('cards-grid');
+    cardData.forEach((item, index) => {
+      const cardHTML = `
+        <div class="card-container h-64 perspective-1000 cursor-pointer" onclick="toggleCard(this)" onmouseleave="resetCard(this)">
+          <div class="card-inner relative w-full h-full transform-style-3d">
+            <div class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden shadow-lg backface-hidden border-2 border-white/80 card-vanish-img">
+              <img src="${item.img}" class="w-full h-full object-cover pointer-events-none" alt="Memory ${index + 1}">
+            </div>
+            <div class="absolute inset-0 w-full h-full rounded-2xl p-5 bg-gradient-to-br from-pink-500 to-rose-500 text-white flex flex-col items-center justify-center text-center backface-hidden rotate-y-180 shadow-lg border-2 border-white/80">
+              <p class="font-cursive text-lg leading-relaxed select-none">"${item.note}"</p>
+            </div>
+          </div>
+        </div>
+      `;
+      gridContainer.innerHTML += cardHTML;
+    });
+
+    function toggleCard(cardElement) { cardElement.classList.toggle('flipped'); }
+    function resetCard(cardElement) { cardElement.classList.remove('flipped'); }
+
+    // Candle Blow Function
+    function blowOutCandle() {
+      if (isBlown) return;
+      isBlown = true;
+
+      document.getElementById('flame').classList.add('flame-off');
+      document.getElementById('flame-inner').classList.add('flame-off');
+
+      const statusTxt = document.getElementById('cake-status');
+      statusTxt.innerText = "Yay! Candle is Blown Out! 🎉";
+      statusTxt.className = "text-sm font-bold text-green-700 bg-green-100 py-2 px-5 rounded-full inline-block";
+
+      document.getElementById('wish-message').classList.remove('hidden');
+      document.getElementById('mic-btn').style.display = 'none';
+      document.getElementById('meter-container').classList.add('hidden');
+
+      if (micStream) {
+        micStream.getTracks().forEach(track => track.stop());
+      }
+
+      confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+    }
+
+    // High Sensitive Microphone Blow Detection Logic
+    async function startMicLogic() {
+      const statusText = document.getElementById('cake-status');
+      const micBtn = document.getElementById('mic-btn');
+      const meterContainer = document.getElementById('meter-container');
+      const volumeMeter = document.getElementById('volume-meter');
+
+      try {
+        // Request Microphone with NoiseSuppression Disabled (Crucial for Blow sound)
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false, 
+            autoGainControl: false
+          }
+        });
+
+        // iOS & Chrome AudioContext Force Initialize
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+
+        const source = audioCtx.createMediaStreamSource(micStream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 512;
+        source.connect(analyser);
+
+        statusText.innerText = "🌬️ Mic Active! Mic-er shamne ghenistho hoye jore phū din!";
+        statusText.className = "text-sm font-medium text-pink-700 bg-pink-100 py-2 px-5 rounded-full inline-block animate-pulse";
+        micBtn.style.display = 'none';
+        meterContainer.classList.remove('hidden');
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function detectBlow() {
+          if (isBlown) return;
+
+          analyser.getByteFrequencyData(dataArray);
+
+          // Calculate Signal Power
+          let sum = 0;
+          for (let i = 0; i < bufferLength; i++) {
+            sum += dataArray[i] * dataArray[i];
+          }
+          let rms = Math.sqrt(sum / bufferLength);
+
+          // Update Sound Visualizer Progress Bar
+          let percentage = Math.min(100, Math.max(0, (rms / 60) * 100));
+          volumeMeter.style.width = percentage + "%";
+
+          // Sensitivity Trigger (Blow Threshold > 25)
+          if (rms > 25) {
+            blowOutCandle();
+            return;
+          }
+
+          requestAnimationFrame(detectBlow);
+        }
+
+        detectBlow();
+
+      } catch (err) {
+        console.error(err);
+        alert("Microphone permission blocked! Address bar-er 🔒 icon-e click kore permission Allow korun athoba Cake-e click kore candle off korun.");
+      }
+    }
+
+    // Floating Hearts Animation
+    function createHearts() {
+      const container = document.getElementById('hearts-container');
+      const heartSymbols = ['❤️', '💖', '😘', '💕', '💋'];
+      for(let i = 0; i < 15; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart-bg text-xl';
+        heart.innerText = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+        heart.style.animationDelay = (Math.random() * 5) + 's';
+        container.appendChild(heart);
+      }
+    }
+    createHearts();
+  </script>
+</body>
+</html>
