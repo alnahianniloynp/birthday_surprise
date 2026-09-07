@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10 Scratch Cards 💖</title>
+  
+  <!-- Tailwind CSS & Canvas Confetti -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    body { 
+      font-family: 'Poppins', sans-serif; 
+      background: radial-gradient(circle at top left, #fbcfe8, #f3e8ff, #ffe6ea);
+      background-attachment: fixed;
+    }
+    .font-cursive { font-family: 'Dancing Script', cursive; }
+
+    .ios-glass {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .scratch-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .scratch-card-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      cursor: pointer;
+      transition: opacity 0.4s ease;
+    }
+
+    /* Party Banner Animation */
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop-in {
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* Floating Emoji Animation - High Visibility */
+    @keyframes floatUp {
+      0% { 
+        transform: translateY(105vh) scale(0.6) rotate(0deg); 
+        opacity: 0.9; 
+      }
+      100% { 
+        transform: translateY(-15vh) scale(1.3) rotate(360deg); 
+        opacity: 0; 
+      }
+    }
+    
+    .floating-emoji {
+      position: absolute;
+      bottom: -50px;
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.15));
+      animation: floatUp linear forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-gray-800 p-4 sm:p-8 flex flex-col items-center justify-between relative overflow-x-hidden">
+
+  <!-- Background Music -->
+  <audio id="scratch-music" loop preload="auto">
+    <source src="level.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- ================= WINNER PARTY BANNER POPUP ================= -->
+  <div id="win-banner" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+    <div class="ios-glass border-4 border-pink-400 bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 text-white p-8 sm:p-12 rounded-3xl max-w-xl text-center shadow-2xl relative animate-pop-in">
+      <div class="text-6xl mb-4 animate-bounce">🎉 👑 💋</div>
+      <h2 class="text-4xl sm:text-5xl font-bold font-cursive mb-4 drop-shadow-md">CONGRATULATIONS!</h2>
+      <p class="text-xl sm:text-2xl font-semibold mb-6 leading-relaxed">
+        You found the Secret Card! <br>
+        <span class="text-yellow-300 font-bold underline decoration-wavy">You won 20 Hugs & 10 Kisses!</span> 🤗😘
+      </p>
+      <button onclick="claimReward()" class="px-8 py-3.5 bg-white text-pink-600 font-bold rounded-full shadow-lg hover:bg-pink-100 hover:scale-105 transition active:scale-95">
+        Claim Your Reward! ❤️
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= FINAL REWARD CELEBRATION SCREEN ================= -->
+  <div id="reward-screen" class="fixed inset-0 z-50 hidden flex flex-col items-center justify-center bg-gradient-to-br from-pink-400 via-rose-300 to-purple-400 p-6 text-center overflow-hidden">
+    
+    <!-- Floating Emojis Container (Set to Z-Index 15 so it renders clearly above background) -->
+    <div id="emoji-container" class="absolute inset-0 pointer-events-none overflow-hidden z-15"></div>
+
+    <div class="ios-glass p-8 sm:p-12 rounded-3xl max-w-2xl border-4 border-white/80 shadow-2xl relative z-20 animate-pop-in bg-white/30 backdrop-blur-2xl">
+      <h1 class="text-4xl sm:text-6xl font-bold text-pink-600 font-cursive mb-4 drop-shadow">
+        Happy Birthday My Special Person! 🎂✨
+      </h1>
+      <p class="text-lg sm:text-2xl font-semibold text-gray-800 mb-6">
+        🎉 May your day be filled with endless smiles & sweetness! 🎉
+      </p>
+
+      <div class="bg-gradient-to-r from-pink-500 to-rose-500 text-white p-6 rounded-2xl shadow-lg mb-8 transform hover:scale-105 transition">
+        <p class="text-2xl sm:text-3xl font-bold font-cursive tracking-wide">
+          💋 20 Hugs & 10 Kisses Due Thaklo! 🤗
+        </p>
+        <p class="text-xs sm:text-sm opacity-90 mt-2">(Joto druto sombhov peye jeno jai kintu! 😉)</p>
+      </div>
+
+      <a href="index.html" class="inline-block px-8 py-3.5 bg-white text-pink-600 font-bold rounded-full shadow-lg hover:bg-pink-100 hover:scale-105 transition active:scale-95">
+        🏠 Back To Home Page
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <div class="max-w-6xl w-full mx-auto">
+    <!-- Header with Timer and Music Controls -->
+    <header class="ios-glass rounded-3xl p-6 mb-8 text-center flex flex-col md:flex-row items-center justify-between gap-4 border border-white/80">
+      <div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-pink-600 font-cursive">10 Secret Scratch Cards ✨</h1>
+        <p class="text-xs text-gray-600">Scratch the cards to find your secret reward!</p>
+      </div>
+
+      <!-- Time & Song Controls -->
+      <div class="flex items-center gap-4 bg-white/50 px-5 py-2.5 rounded-2xl shadow-inner">
+        <!-- Timer -->
+        <div class="text-left border-r border-pink-200 pr-4">
+          <span class="text-[10px] text-pink-500 font-semibold uppercase block">Time Spent</span>
+          <span id="timer" class="text-lg font-bold text-gray-700">00:00</span>
+        </div>
+
+        <!-- Music Button -->
+        <button onclick="toggleMusic()" id="music-btn" class="flex items-center gap-2 text-xs bg-pink-500 text-white px-4 py-2 rounded-xl font-medium shadow hover:bg-pink-600 transition">
+          🎵 <span id="music-status">Play Music</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 10 Scratch Cards Grid -->
+    <div id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <!-- Generated Dynamically via JS -->
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center">
+      <a href="index.html" class="inline-block px-8 py-3 bg-gradient-to-r from-pink-500 to-rose-400 text-white font-semibold rounded-2xl shadow-lg hover:shadow-pink-500/30 hover:scale-105 transition">
+        ⬅ Back to Main Page
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /* ================= 1. TIMER LOGIC ================= */
+    let seconds = 0;
+    const timerElement = document.getElementById('timer');
+    setInterval(() => {
+      seconds++;
+      const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const secs = String(seconds % 60).padStart(2, '0');
+      timerElement.innerText = `${mins}:${secs}`;
+    }, 1000);
+
+    /* ================= 2. MUSIC LOGIC ================= */
+    const music = document.getElementById('scratch-music');
+    const musicStatus = document.getElementById('music-status');
+    let isPlaying = false;
+
+    function playAudioAutomatically() {
+      if (!isPlaying) {
+        music.play().then(() => {
+          isPlaying = true;
+          musicStatus.innerText = "Pause Music";
+        }).catch(err => console.log("Audio waiting for user interaction."));
+      }
+    }
+
+    function toggleMusic() {
+      if (isPlaying) {
+        music.pause();
+        musicStatus.innerText = "Play Music";
+        isPlaying = false;
+      } else {
+        music.play();
+        musicStatus.innerText = "Pause Music";
+        isPlaying = true;
+      }
+    }
+
+    /* ================= 3. CARDS DATA ================= */
+    const cardsData = [
+      { icon: "😜", note: "Better luck next time, Russian!", isSecret: false },
+      { icon: "🤖", note: "Better luck next time, fazil! 😜", isSecret: false },
+      { icon: "🙈", note: "Oops! Better luck next time, hottie!", isSecret: false },
+      { icon: "🤣", note: "ragh krco nki, Russian! 🙈", isSecret: false },
+      { icon: "🤪", note: "keep patience, Russian! 😜", isSecret: false },
+      { icon: "🤡", note: "Try again! Better luck next time, Russian!", isSecret: false },
+      { icon: "👀", note: "keep scratching ! 🤣", isSecret: false },
+      { icon: "👻", note: "Again Better luck next time, Russian! 🙈", isSecret: false },
+      { icon: "😂", note: "Last hope! 🤪", isSecret: false },
+      { icon: "🎁", note: "SECRET REVEALED: You won 20 Hugs & 10 Kisses! 💋🤗", isSecret: true },
+    ];
+
+    const cardsGrid = document.getElementById('cards-grid');
+
+    cardsData.forEach((item, index) => {
+      const cardHTML = `
+        <div class="scratch-container ios-glass border-2 border-white/80 shadow-lg">
+          <div class="scratch-card-content ${item.isSecret ? 'bg-gradient-to-br from-amber-400 via-rose-500 to-pink-500 text-white font-bold' : 'bg-gradient-to-br from-pink-400 to-rose-400 text-white'}">
+            <span class="text-3xl mb-1">${item.icon}</span>
+            <p class="font-semibold text-sm leading-snug">${item.note}</p>
+          </div>
+          <canvas id="scratch-canvas-${index}"></canvas>
+        </div>
+      `;
+      cardsGrid.innerHTML += cardHTML;
+    });
+
+    /* ================= 4. SCRATCH ENGINE & FULL CLEAR DETECTOR ================= */
+    let hasWon = false;
+
+    function initScratchCard(canvasId, isSecret) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      let isDrawing = false;
+      let isCardRevealed = false;
+
+      function resizeCanvas() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        ctx.fillStyle = '#f9a8d4';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.font = 'bold 15px Poppins';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('Scratch Here! 🪙', canvas.width / 2, canvas.height / 2);
+      }
+
+      resizeCanvas();
+
+      function checkScratchPercentage() {
+        if (isCardRevealed) return;
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+        let transparentPixels = 0;
+
+        for (let i = 3; i < pixels.length; i += 4) {
+          if (pixels[i] === 0) transparentPixels++;
+        }
+
+        const percentage = (transparentPixels / (pixels.length / 4)) * 100;
+
+        if (percentage > 85) {
+          isCardRevealed = true;
+          canvas.style.opacity = '0';
+          setTimeout(() => canvas.remove(), 400);
+
+          if (isSecret && !hasWon) {
+            triggerWin();
+          }
+        }
+      }
+
+      function scratch(e) {
+        if (!isDrawing) return;
+        
+        playAudioAutomatically();
+
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+        const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+
+        checkScratchPercentage();
+      }
+
+      canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
+      canvas.addEventListener('mousemove', scratch);
+      canvas.addEventListener('mouseup', () => isDrawing = false);
+      
+      canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+      canvas.addEventListener('touchmove', scratch);
+      canvas.addEventListener('touchend', () => isDrawing = false);
+    }
+
+    // Trigger Win Banner & Confetti
+    function triggerWin() {
+      hasWon = true;
+      setTimeout(() => {
+        document.getElementById('win-banner').classList.remove('hidden');
+        confetti({
+          particleCount: 200,
+          spread: 100,
+          origin: { y: 0.5 }
+        });
+      }, 300);
+    }
+
+    /* ================= 5. CLAIM REWARD & FLOATING EMOJIS ================= */
+    function claimReward() {
+      // Hide Popup Banner
+      document.getElementById('win-banner').classList.add('hidden');
+      
+      // Show Final Animated Reward Screen
+      document.getElementById('reward-screen').classList.remove('hidden');
+
+      // Play Confetti Again
+      confetti({
+        particleCount: 250,
+        spread: 100,
+        origin: { y: 0.4 }
+      });
+
+      // Start Floating Emojis Animation
+      createFloatingEmojis();
+    }
+
+    function createFloatingEmojis() {
+      const container = document.getElementById('emoji-container');
+      const emojis = ['🎂', '💖', '💋', '🤗', '🎉', '🎈', '✨', '👑', '🎁', '❤️', '🥳'];
+
+      // Generate emojis continuously
+      setInterval(() => {
+        const emoji = document.createElement('div');
+        emoji.className = 'floating-emoji text-4xl sm:text-6xl';
+        emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        
+        // Random horizontal positions across full screen width
+        emoji.style.left = Math.random() * 92 + 'vw';
+        
+        // Random float duration between 3.5s and 6s
+        const duration = (Math.random() * 2.5 + 3.5);
+        emoji.style.animationDuration = duration + 's';
+        
+        container.appendChild(emoji);
+
+        // Cleanup DOM after animation completes
+        setTimeout(() => {
+          emoji.remove();
+        }, duration * 1000);
+      }, 200);
+    }
+
+    // Initialize all 10 cards
+    cardsData.forEach((item, index) => {
+      initScratchCard(`scratch-canvas-${index}`, item.isSecret);
+    });
+  </script>
+</body>
+</html>
