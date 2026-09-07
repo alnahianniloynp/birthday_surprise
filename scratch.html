@@ -55,6 +55,7 @@
       z-index: 10;
       cursor: pointer;
       transition: opacity 0.4s ease;
+      touch-action: none; /* মোবাইলে স্ক্র্যাচ করার সময় স্ক্রিন স্ক্রল হওয়া বন্ধ করবে */
     }
 
     /* Party Banner Animation */
@@ -113,7 +114,7 @@
   <!-- ================= FINAL REWARD CELEBRATION SCREEN ================= -->
   <div id="reward-screen" class="fixed inset-0 z-50 hidden flex flex-col items-center justify-center bg-gradient-to-br from-pink-400 via-rose-300 to-purple-400 p-6 text-center overflow-hidden">
     
-    <!-- Floating Emojis Container (Set to Z-Index 15 so it renders clearly above background) -->
+    <!-- Floating Emojis Container -->
     <div id="emoji-container" class="absolute inset-0 pointer-events-none overflow-hidden z-15"></div>
 
     <div class="ios-glass p-8 sm:p-12 rounded-3xl max-w-2xl border-4 border-white/80 shadow-2xl relative z-20 animate-pop-in bg-white/30 backdrop-blur-2xl">
@@ -305,12 +306,23 @@
         checkScratchPercentage();
       }
 
+      // Mouse Event Listeners
       canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
       canvas.addEventListener('mousemove', scratch);
       canvas.addEventListener('mouseup', () => isDrawing = false);
       
-      canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
-      canvas.addEventListener('touchmove', scratch);
+      // Touch Event Listeners (with preventDefault to prevent mobile scrolling)
+      canvas.addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        isDrawing = true; 
+        scratch(e); 
+      }, { passive: false });
+
+      canvas.addEventListener('touchmove', (e) => { 
+        e.preventDefault(); 
+        scratch(e); 
+      }, { passive: false });
+
       canvas.addEventListener('touchend', () => isDrawing = false);
     }
 
@@ -329,20 +341,15 @@
 
     /* ================= 5. CLAIM REWARD & FLOATING EMOJIS ================= */
     function claimReward() {
-      // Hide Popup Banner
       document.getElementById('win-banner').classList.add('hidden');
-      
-      // Show Final Animated Reward Screen
       document.getElementById('reward-screen').classList.remove('hidden');
 
-      // Play Confetti Again
       confetti({
         particleCount: 250,
         spread: 100,
         origin: { y: 0.4 }
       });
 
-      // Start Floating Emojis Animation
       createFloatingEmojis();
     }
 
@@ -350,22 +357,18 @@
       const container = document.getElementById('emoji-container');
       const emojis = ['🎂', '💖', '💋', '🤗', '🎉', '🎈', '✨', '👑', '🎁', '❤️', '🥳'];
 
-      // Generate emojis continuously
       setInterval(() => {
         const emoji = document.createElement('div');
         emoji.className = 'floating-emoji text-4xl sm:text-6xl';
         emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
         
-        // Random horizontal positions across full screen width
         emoji.style.left = Math.random() * 92 + 'vw';
         
-        // Random float duration between 3.5s and 6s
         const duration = (Math.random() * 2.5 + 3.5);
         emoji.style.animationDuration = duration + 's';
         
         container.appendChild(emoji);
 
-        // Cleanup DOM after animation completes
         setTimeout(() => {
           emoji.remove();
         }, duration * 1000);
